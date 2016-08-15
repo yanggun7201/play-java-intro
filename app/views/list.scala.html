@@ -1,0 +1,46 @@
+@*
+ * This template takes a single argument, a String containing a
+ * message to display.
+ *@
+@(personList: List[Person])
+
+@import helper._
+@import java.text.SimpleDateFormat
+@import java.util.Locale
+
+@*
+ * Call the `main` template with two arguments. The first
+ * argument is a `String` with the title of the page, the second
+ * argument is an `Html` object containing the body of the page.
+ *@
+@main("Welcome to Play") {
+    @*for(index <- 0 until personList.size){
+        if(index % 3 == 0){
+        <ul>
+        }
+
+        <li>@personList(index)</li>
+
+        @if(index % 3 == 2 || index == (personList.size - 1)){
+        </ul>
+        }
+    }*@
+
+    <form action="@routes.HomeController.newPerson()" method="get">
+        <input type="submit" value="Regist Person" />
+    </form>
+
+    @if(personList.size == 0) {
+        <p>Oooop`s no search data</p>
+    }
+
+    @for(item <- personList){
+    <ul>
+        <li>
+            <span>name : @item.name</span>
+            <span style="margin-left: 2em">nick : @item.nick</span>
+            <span style="margin-left: 2em">date : @(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", new Locale("ko", "KR")).format(item.dueDate))</span>
+        </li>
+    </ul>
+    }
+}
