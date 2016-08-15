@@ -3,4 +3,4 @@
 Basic feature list:
 
  * Person list
- * Preson regist
+ * Person regist
