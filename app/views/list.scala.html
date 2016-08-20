@@ -1,46 +1,138 @@
-@*
- * This template takes a single argument, a String containing a
- * message to display.
- *@
-@(personList: List[Person])
+@(currentPage: Application.Page, currentSortBy: String, currentOrder: String, currentFilter: String)
 
-@import helper._
-@import java.text.SimpleDateFormat
-@import java.util.Locale
-
-@*
- * Call the `main` template with two arguments. The first
- * argument is a `String` with the title of the page, the second
- * argument is an `Html` object containing the body of the page.
- *@
-@main("Welcome to Play") {
-    @*for(index <- 0 until personList.size){
-        if(index % 3 == 0){
-        <ul>
+@****************************************
+* Helper generating navigation links    *
+****************************************@
+@link(newPage:Int, newSortBy:String) = @{
+    
+    var sortBy = currentSortBy
+    var order = currentOrder
+    
+    if(newSortBy != null) {
+        sortBy = newSortBy
+        if(currentSortBy == newSortBy) {
+            if(currentOrder == "asc") {
+                order = "desc"
+            } else {
+                order = "asc"
+            }
+        } else {
+            order = "asc"
         }
-
-        <li>@personList(index)</li>
-
-        @if(index % 3 == 2 || index == (personList.size - 1)){
-        </ul>
-        }
-    }*@
-
-    <form action="@routes.HomeController.newPerson()" method="get">
-        <input type="submit" value="Regist Person" />
-    </form>
-
-    @if(personList.size == 0) {
-        <p>Oooop`s no search data</p>
     }
-
-    @for(item <- personList){
-    <ul>
-        <li>
-            <span>name : @item.name</span>
-            <span style="margin-left: 2em">nick : @item.nick</span>
-            <span style="margin-left: 2em">date : @(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", new Locale("ko", "KR")).format(item.dueDate))</span>
-        </li>
-    </ul>
-    }
+    
+    // Generate the link
+    routes.Application.list(newPage, sortBy, order, currentFilter)
+    
 }
+
+@**********************************
+* Helper generating table headers *
+***********************************@
+@header(key:String, title:String) = {
+    <th class="@key.replace(".","_") header @if(currentSortBy == key) @{if(currentOrder == "asc") "headerSortDown" else "headerSortUp"}">
+        <a href="@link(0, key)">@title</a>
+    </th>
+}
+
+@main("Welcome to Play") {
+    
+    <h1 id="homeTitle">@Messages("computers.list.title", currentPage.getTotalRowCount)</h1>
+
+    @if(flash.containsKey("success")) {
+        <div class="alert-message warning">
+            <strong>Done!</strong> @flash.get("success")
+        </div>
+    } 
+
+    <div id="actions">
+        
+        <form action="@link(0, "name")" method="GET">
+            <input type="search" id="searchbox" name="f" value="@currentFilter" placeholder="Filter by computer name...">
+            <input type="submit" id="searchsubmit" value="Filter by name" class="btn primary">
+        </form>
+        
+        <a class="btn success" id="add" href="@routes.Application.create()">Add a new computer</a>
+        
+    </div>
+    
+    @if(currentPage.getTotalRowCount == 0) {
+        
+        <div class="well">
+            <em>Nothing to display</em>
+        </div>
+        
+    } else {
+        
+        <table class="computers zebra-striped">
+            <thead>
+                <tr>
+                    @header("name", "Computer name")
+                    @header("introduced", "Introduced")
+                    @header("discontinued", "Discontinued")
+                    @header("company.name", "Company")
+                </tr>
+            </thead>
+            <tbody>
+
+                @for(computer <- currentPage.getList) {
+                    <tr>
+                        <td><a href="@routes.Application.edit(computer.id)">@computer.name</a></td>
+                        <td>
+                            @if(computer.introduced == null) {
+                                <em>-</em>
+                            } else {
+                                @computer.introduced.format("dd MMM yyyy")
+                            }
+                        </td>
+                        <td>
+                            @if(computer.discontinued == null) {
+                                <em>-</em>
+                            } else {
+                                @computer.discontinued.format("dd MMM yyyy")
+                            }
+                        </td>
+                        <td>
+                            @if(computer.company == null) {
+                                <em>-</em>
+                            } else {
+                                @computer.company.name
+                            }
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+
+        <div id="pagination" class="pagination">
+            <ul>
+                @if(currentPage.hasPrev) {
+                    <li class="prev">
+                        <a href="@link(currentPage.getPageIndex - 1, null)">&larr; Previous</a>
+                    </li>
+                } else {
+                    <li class="prev disabled">
+                        <a>&larr; Previous</a>
+                    </li>
+                }
+                <li class="current">
+                    <a>Displaying @currentPage.getDisplayXtoYofZ</a>
+                </li>
+                @if(currentPage.hasNext) {
+                    <li class="next">
+                        <a href="@link(currentPage.getPageIndex + 1, null)">Next &rarr;</a>
+                    </li>
+                } else {
+                    <li class="next disabled">
+                        <a>Next &rarr;</a>
+                    </li>
+                }
+            </ul>
+        </div>
+        
+    }
+        
+}
+
+            

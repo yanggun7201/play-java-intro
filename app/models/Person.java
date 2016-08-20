@@ -3,7 +3,6 @@ package models;
 import java.util.*;
 import javax.persistence.*;
 
-import com.avaje.ebean.Model;
 import play.data.format.*;
 import play.data.validation.*;
 
@@ -12,7 +11,7 @@ import play.data.validation.*;
  */
 @Entity
 @Table(name="tb_person")
-public class Person extends Model {
+public class Person {
     @Id
     @Column(name="person_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,6 +30,4 @@ public class Person extends Model {
     @Column(name="reg_date")
     @Formats.DateTime(pattern="yyyy/MM/dd")
     public Date dueDate = new Date();
-
-    public static Finder<Long, Person> find = new Finder<Long,Person>(Person.class);
 }
