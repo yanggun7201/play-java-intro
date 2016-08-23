@@ -22,8 +22,6 @@ public class Application extends Controller {
     @Inject
     private FormFactory formFactory;
     @Inject
-    private JPAApi jpaApi;
-    @Inject
     private ComputerService computerService;
 
     /**
