@@ -14,3 +14,5 @@ libraryDependencies ++= Seq(
   "com.h2database" % "h2" % "1.4.191",
   "org.hibernate" % "hibernate-entitymanager" % "5.1.0.Final"
 )
+
+libraryDependencies += evolutions
