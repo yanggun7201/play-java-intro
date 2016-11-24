@@ -10,3 +10,4 @@ Basic feature list:
  * Play Framework 2.5.4
  * computer-datebase-jpa sample
  * JDK 1.8
+ * aaa
